@@ -1,0 +1,402 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <meta charset="UTF-8">
+  <title>Exploration G25 Médiévale</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+  <header class="bg-blue-800 text-white py-6 text-center">
+    <h1 class="text-3xl font-bold">JCSL : Profil G25 – Période Médiévale Ancienne</h1>
+      <img src="https://i.imgur.com/EBSwSnA.jpeg" alt="Image Généalogique" class="mx-auto mt-4 rounded shadow max-h-[600px] w-auto">  
+    <!-- https://drive.google.com/uc?export=view&id=1uTS00IEoCi0SPTG-TnC-MNQv8JihuE46 --> 
+    <p class="text-sm">Données génétiques interprétées</p>
+  </header>
+
+  <main class="max-w-6xl mx-auto p-6">
+    <section class="mb-12">
+      <h2 class="text-xl font-semibold mb-4 text-blue-700">Graphique des Composantes</h2>
+      <div class="bg-white p-4 rounded shadow">
+        <canvas id="g25Chart" class="w-full h-96"></canvas>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="text-xl font-semibold mb-4 text-blue-700">Interprétation des Composantes</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ul id="componentList" class="space-y-2"></ul>
+        <div id="detailsPanel" class="bg-white p-4 rounded shadow text-sm leading-relaxed overflow-y-auto h-96 border border-blue-100">
+          <p class="text-gray-500">Cliquez sur une composante pour voir l'interprétation.</p>
+        </div>
+      </div>
+    </section>
+<section class="mt-16">
+  <h2 class="text-xl font-semibold mb-4 text-blue-700">Vos Haplogroupes ADN-Y et ADNmt</h2>
+  <div class="overflow-x-auto bg-white p-4 rounded shadow">
+    <table class="min-w-full text-sm text-left border border-gray-200">
+      <thead class="bg-blue-100 text-blue-800">
+        <tr>
+          <th class="py-2 px-3">Haplogroupe</th>
+          <th class="py-2 px-3">Type</th>
+          <th class="py-2 px-3">Âge Estimé</th>
+          <th class="py-2 px-3">Origine Géographique</th>
+          <th class="py-2 px-3">Interprétation</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <tr>
+          <td class="py-2 px-3 font-medium"><B>R1b-L238</B></td>
+          <td class="py-2 px-3">Y-ADN</td>
+          <td class="py-2 px-3">Antiquité</td>
+          <td class="py-2 px-3">Europe occidentale / Scandinavie</td>
+          <td class="py-2 px-3">Lignée paternelle commune en Europe ; liée aux migrations germaniques et vikings vers l’Angleterre, l’Irlande, l’Allemagne et le Danemark.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-3 font-medium"><B>R-FT10034</B></td>
+          <td class="py-2 px-3">Y-ADN</td>
+          <td class="py-2 px-3">~1 av. notre ère</td>
+          <td class="py-2 px-3">Angleterre / Martinique</td>
+          <td class="py-2 px-3">Lignée récente ayant migré/colonisé des îles Britanniques vers les Caraïbes, présente en Martinique ; intégration coloniale européenne.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-3 font-medium"><B>K2a5e</B></td>
+          <td class="py-2 px-3">ADNmt</td>
+          <td class="py-2 px-3">~150 av. notre ère</td>
+          <td class="py-2 px-3">Suède / Allemagne</td>
+          <td class="py-2 px-3">Lignée maternelle liée à l’Europe du Nord, en lien avec vos composantes G25 germaniques et vikings.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-3 font-medium"><B>K2a5</B> (parent)</td>
+          <td class="py-2 px-3">ADNmt</td>
+          <td class="py-2 px-3">~2400 av. notre ère</td>
+          <td class="py-2 px-3">Europe large (France, Portugal, Russie)</td>
+          <td class="py-2 px-3">Lignée maternelle européenne étendue, présente en France et Angleterre.</td>
+        </tr>
+        <tr>
+          <td class="py-2 px-3 font-medium"><B>K</B> (parent)</td>
+          <td class="py-2 px-3">ADNmt</td>
+          <td class="py-2 px-3">~26 000 – 30 000 ans</td>
+          <td class="py-2 px-3">Proche-Orient</td>
+          <td class="py-2 px-3">Origine préhistorique proche-orientale, liée à l’expansion néolithique vers l’Europe.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <br>
+<h2 class="text-xl font-semibold mb-4 text-blue-700">Carte des Régions d'Origine G25</h2>
+<div class="mb-4 flex justify-end">
+  <label class="mr-2 text-sm text-gray-700">Filtrer par % :</label>
+  <select id="g25Filter" class="text-sm border rounded px-2 py-1 shadow-sm">
+    <option value="all">Tous</option>
+    <option value="gt10">> 10%</option>
+    <option value="btw5_10">5–10%</option>
+    <option value="lt5">< 5%</option>
+  </select>
+</div>
+
+  <div id="g25Map" class="w-full h-[600px] rounded shadow border border-gray-300"></div>
+</section>
+<section id="tapisserie" class="tab-content bg-white p-6 rounded-lg shadow">
+  <h2 class="text-3xl font-bold text-blue-800 mb-6">Une Tapisserie ancestrale : Interprétation de vos résultats G25 et Haplogroupes</h2>
+
+  <nav class="mb-8 p-4 bg-slate-50 border border-slate-200 rounded">
+    <h3 class="text-lg font-semibold text-blue-700 mb-2">Table des matières</h3>
+    <ul class="list-disc list-inside space-y-1 text-sm text-blue-800">
+      <li><a href="#tapisserie-intro" class="hover:underline">I. Introduction</a></li>
+      <li><a href="#tapisserie-g25" class="hover:underline">II. Résultats G25</a></li>
+      <li><a href="#tapisserie-y" class="hover:underline">III. Lignée Paternelle</a></li>
+      <li><a href="#tapisserie-mt" class="hover:underline">IV. Lignée Maternelle</a></li>
+      <li><a href="#tapisserie-synthese" class="hover:underline">V. Synthèse</a></li>
+      <li><a href="#tapisserie-conclusion" class="hover:underline">VI. Conclusion</a></li>
+    </ul>
+  </nav>
+
+  <article class="prose lg:prose-md max-w-none prose-blue">
+    <h3 id="tapisserie-intro"><B>I. Introduction : Dévoiler votre récit Ancestral</B></h3>
+    <p>
+    Composante africaine moderne (proxi SSA) 19,6 %<br><br>
+        • Comme attendu, ce pourcentage reflète l’ascendance africaine récente issue de la traite transatlantique (XVIᵉ–XIXᵉ siècle), absente des bases médiévales.<br>
+        • Cela correspond très probablement à des ancêtres originaires de l'Afrique de l’Ouest (Bénin, Ghana, Nigeria, Angola, etc.), majoritaires dans les apports africains vers les Antilles et la Guyane.
+    </p>
+  <div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+    <h3 id="tapisserie-g25"><B>II. Décryptage de vos résultats G25 de la période Médiévale Ancienne</B></h3>
+    <!-- <blockquote class="border-l-4 border-blue-300 pl-4 italic text-sm">Le G25 est un calculateur d'admixture génétique...</blockquote><br> -->
+    <h4>Composantes européennes médiévales (80,4 %) – Analyse région par région</h4><br>
+    <h4><B>A. Le Cœur Ibérique : Espagne Médiévale (17,0 %)</B></h4><br>
+    <p>
+      Échantillon <B>I10897</B> : Région ibérique – époque chrétienne médiévale.<br>
+        •  ou au peuplement hispanique précoce.<br>
+        • ⚠️ Bien que vous soyez antillais/guyanais, une influence hispanique coloniale indirecte (par échanges, migrations secondaires) peut expliquer ce résultat.
+    </p>
+
+<div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h4><B>B. Connexions Insulaires : Irlande médiévale. (8,6 %)</B></h4><br>
+    <p>
+    Échantillon <B>KIL030.A</B> :<br>  
+      • Cela suggère une forte contribution ibérique, possiblement liée à l’époque coloniale espagnole (mythe de la Grande Armada, très peu probable dans mon cas)<br>
+      • Échantillon normando-saxon irlandais (<B>Kilteasheen</B>).<br>
+      • Cela colle parfaitement à vos haplogroupes R-L238 / R-FT10034, présents chez les Anglo-Normands, Saxons et Scandinaves.<br>
+      • Trace potentielle d’ancêtres d’origine anglo-irlandaise, normande, voire viking tardif.<br>
+    </p>
+<div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h4><B>C. Albanie médiévale (9,6 %)</B></h4><br>
+    <p>
+      Échantillon <B>I14622</B>.<br>
+      • Peu attendu. Ce signal pourrait refléter :<br>
+        ◦ Une composante balkanique secondaire présente dans les Européens du Sud (Espagnols ou Italiens)<br>
+        ◦ Une proximité avec des Juifs sépharades ou levantins dans les échantillons (voir plus bas)<br>
+    </p>
+<div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h4><B>D. Italie / Sardaigne médiévales (7,0 % + 0,8 %)</B></h4><br>
+    <p>
+    • Présence de Sardes médiévaux et néolithiques tardifs.<br>
+    • Reflète peut-être l’ancien substrat méditerranéen néolithique associé à votre lignée maternelle K2a5e.<br>
+    </p>
+    <div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h4><B>E. Connexions Insulaires : Angleterre médiévale (6,2–6,8–5,2–1,0 %)</B></h4><br>
+    <p>
+    • Multiples échantillons saxons et anglo-saxons.<br>
+    • Cela renforce fortement l'hypothèse d’un héritage scandinave/germanique occidental, en cohérence totale avec R1b-P312 > R-L238.<br>
+    • Probable héritage par voie paternelle (ADN-Y), introduit dans les Amériques via des colons/militaires ou marchands européens (XVII–XIXe siècles).<br>
+    </p>
+    <div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h4><B>F. Allemagne / Danemark médiévaux saxons (~7 %)</B></h4><br>
+    <p>
+    • Échantillons saxons allemands et danois.<br>
+    • Complètent le bloc anglo-saxon du nord de l’Europe.<br>
+    • Appuient une origine génétique germano-scandinave, typique de certains porteurs de R1b-L238.<br>
+    </p>
+    <div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h4><B>G. Échos Méditerranéens et Levantins :</B><br>
+           Liban médiéval (5,2 %)</h4><br>
+    <p>
+    • Étonnant mais pas incohérent. (ADNmt K2a5e)<br>
+    • Peut refléter :<br>
+        ◦ Ancêtres juifs (ashkénazes ou sépharades)<br>
+        ◦ Influence levantine secondaire dans le sud de l'Europe (Italie, Espagne, Balkans)<br>
+    </p>
+    <div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h4><B>H. Fils d'Europe du Nord et de l'Est :</B><br>
+           Estonie médiévale (4,6 %)</h4><br>
+    <p>
+    • Composante balte ou finno-ougrienne.<br>
+    • Peut dériver de contacts nordiques / scandinaves, compatibles avec votre ADN-Y.<br>
+    </p>
+<div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h3 id="tapisserie-y"><B>III. Votre Lignée Paternelle : Haplogroupe Y R1b-L238 terminal R-FT10034</B></h3>
+    <h4><B>Ces sous-clades du macro-haplogroupe R1b sont rares et spécifiques :</B></h4>
+    <p>
+    • <B>R-L238</B> :<br>
+        ◦ Branché sur <B>R1b-P312</B>, trouvé principalement dans le nord de l’Europe (Scandinavie, Allemagne, Îles britanniques)<br>
+        ◦ Rare mais détecté en Suède, Islande, Norvège (âge du bronze → médiéval)<br>
+    • <B>R-FT10034</B> :<br>
+        ◦ Sous-clade récente (~1000–2000 ans), peu documentée, souvent associée à des généalogies anglo-saxonnes<br>
+        ◦ Peut résulter de la diffusion viking ou post-viking, ou des migrations européennes vers les Amériques<br>
+    📌 Conclusion partielle : Votre lignée paternelle est d’origine nord-européenne (probablement scandinave). Ce profil est atypique dans les populations antillaises, suggérant un apport génétique masculin européen distinct, peut-être colonial, commerçant ou militaire.<br>
+    </p>
+<div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h3 id="tapisserie-mt"><B>IV. Votre Lignée Maternelle :</B></h3>
+    <h4>🔹 Haplogroupe mitochondrial, lignée maternelle transmise uniquement par les mères : <B>K2a5e</B></h4>
+    <p>
+        ◦ Sous-clade du haplogroupe K, lui-même dérivé de <B>U8b</B>, souvent associée à l’expansion néolithique en Europe<br>
+        ◦ Distribution en Europe du Sud et de l’Est, parfois trouvée dans des contextes juifs ashkénazes et levantins<br>
+        ◦ Enregistrée dans des profils anciens européens dès le Néolithique tardif et au Moyen Âge<br>
+    📌 Conclusion partielle : Votre lignée maternelle pourrait provenir d’Europe du Sud-Est ou Centrale, voire d’un foyer néolithique ancien.<br>
+    </p>
+<div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h3 id="tapisserie-synthese"><B>V. 🧩 Synthèse du profil génétique ancien (médiéval)</B></h3>
+    <h4>🌍 Répartition estimée (approximative sur base des sources  « top »)</h4><br>
+    <p>
+    • Afrique de l’Ouest (moderne, proxi SSA) : ~20 %<br>
+    • Europe ibérique (Espagne) : ~17 %<br>
+    • Europe anglo-germano-scandinave (Irlande, Angleterre, Allemagne, Danemark) : ~30 %<br>
+    • Europe du Sud-Est et Méditerranée (Italie, Albanie, Liban) : ~27 %<br>
+    • Europe balte / Estonie : ~5–6 %<br>
+    </p>
+<div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+
+    <h3 id="tapisserie-conclusion"><B>VI. 🧭 Conclusion interprétative</B></h3>
+    <h4>Vous êtes le produit d’un métissage complexe entre :</h4><br>
+    <p>
+    • Une lignée paternelle d’Europe du Nord-Ouest (probablement anglo-saxonne ou scandinave)<br>
+    • Une lignée maternelle méditerranéenne / sud-est européenne<br>
+    • Un héritage moderne africain lié à la traite transatlantique<br>
+    Vos ancêtres ont probablement contribué aux populations coloniales ou créoles dans les Antilles et la Guyane, et votre profil génétique reflète les trajectoires croisées de l’Europe médiévale, de l’Afrique moderne et des Amériques coloniales.<br>
+    </p>
+<div class="mt-4 text-right"><a href="#tapisserie" class="text-sm text-blue-600 hover:underline">↥ Revenir en haut</a></div>
+  </article>
+</section>
+
+<a class="nav-link py-2 px-3 hover:bg-sky-700 rounded-md transition-colors duration-200" data-tab="tapisserie">Tapisserie Ancestrale</a>
+
+ </main>
+
+  <script>
+    const g25Data = [
+      { name: "Spain_Medieval:I10897", percent: 17.0, details_id: "spain" },
+      { name: "Albania_Medieval:I14622", percent: 9.6, details_id: "albania" },
+      { name: "Ireland_Kilteasheen...", percent: 8.6, details_id: "ireland" },
+      { name: "Italy_Sardinia_Early...", percent: 7.0, details_id: "sardinia_early" },
+      { name: "England_EarlyMedieval:I11581", percent: 6.8, details_id: "england1" },
+      { name: "England_EarlyMedieval_Saxon:I20672", percent: 6.2, details_id: "england_saxon1" },
+      { name: "England_EarlyMedieval:I11571", percent: 5.2, details_id: "england2" },
+      { name: "Lebanon_Medieval...", percent: 5.2, details_id: "lebanon" },
+      { name: "Estonia_Medieval...", percent: 4.6, details_id: "estonia" },
+      { name: "Germany_EarlyMedieval...", percent: 4.6, details_id: "germany1" },
+      { name: "Denmark_Zealand_Saxon...", percent: 2.2, details_id: "denmark1" },
+      { name: "England_EarlyMedieval_Saxon:I20607", percent: 1.0, details_id: "england_saxon2" },
+      { name: "Italy_Sardinia_Medieval:SNN002", percent: 0.8, details_id: "sardinia2" },
+      { name: "Russia_Kusnarenkovo...", percent: 0.8, details_id: "russia" },
+      { name: "Denmark_Zealand_Saxon...", percent: 0.4, details_id: "denmark2" },
+      { name: "Germany_Drantum_Saxon...", percent: 0.2, details_id: "germany2" },
+      { name: "Ukraine_Medieval...", percent: 0.2, details_id: "ukraine" }
+    ];
+
+    const g25Details = {
+      spain: `<strong>Espagne Médiévale :</strong> 17% – Présence dans la péninsule Ibérique durant la Reconquista, avec influences wisigothiques, musulmanes et juives.`,
+      ireland: `<strong>Irlande (Kilteasheen) :</strong> 8.6% – Migrations anglo-normandes et vikings, influence anglo-saxonne intégrée.`,
+      albania: `<strong>Albanie Médiévale :</strong> 9.6% – Carrefours d'influences romaines, byzantines, slaves, ottomanes.`,
+      sardinia_early: `<strong>Sardaigne (Début Médiéval) :</strong> 7% – Traces phéniciennes, puniques, romaines.`,
+      sardinia2: `<strong>Sardaigne (Médiéval) :</strong> 0.8% – Flux migratoires continus vers l’île au Moyen Âge.`,
+      england1: `<strong>Angleterre Début Médiéval :</strong> 6.8% – Royaumes anglo-saxons, christianisation, invasions vikings.`,
+      england_saxon1: `<strong>Angleterre Saxon :</strong> 6.2% – Ascendance germanique de migrants saxons.`,
+      england2: `<strong>Angleterre Début Médiéval :</strong> 5.2% – Voir ci-dessus.`,
+      england_saxon2: `<strong>Angleterre Saxon :</strong> 1% – Petite trace saxonne renforçant l'héritage britannique.`,
+      lebanon: `<strong>Liban Médiéval :</strong> 5.2% – États croisés, commerce levantin, interactions byzantines.`,
+      estonia: `<strong>Estonie Médiévale :</strong> 4.6% – Mouvements de populations en Europe du Nord-Est.`,
+      germany1: `<strong>Allemagne Médiévale :</strong> 4.6% – Migrations germaniques, Ostsiedlung.`,
+      germany2: `<strong>Allemagne Drantum Saxon :</strong> 0.2% – Trace d’ascendance saxonne.`,
+      denmark1: `<strong>Danemark Zélande Saxon :</strong> 2.2% – Migrations vikings et saxonnes vers l’Angleterre.`,
+      denmark2: `<strong>Danemark Zélande Saxon :</strong> 0.4% – Petite composante danoise/germanique.`,
+      russia: `<strong>Russie Médiévale :</strong> 0.8% – Influence des Varègues (Vikings).`,
+      ukraine: `<strong>Ukraine Médiévale :</strong> 0.2% – Liens indirects à la diaspora viking.`
+    };
+
+    const ctx = document.getElementById('g25Chart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: g25Data.map(e => `${e.name} (${e.percent}%)`),
+        datasets: [{
+          label: "Pourcentage",
+          data: g25Data.map(e => e.percent),
+          backgroundColor: '#60a5fa'
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: { display: true, text: "Pourcentage (%)" }
+          }
+        },
+        onClick: (e, elements) => {
+          if (elements.length > 0) {
+            const idx = elements[0].index;
+            const key = g25Data[idx].details_id;
+            document.getElementById('detailsPanel').innerHTML = g25Details[key] || "Interprétation non disponible.";
+          }
+        }
+      }
+    });
+
+    const listContainer = document.getElementById('componentList');
+    g25Data.forEach((d, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<button class="text-left w-full px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded" onclick="document.getElementById('detailsPanel').innerHTML = g25Details['${d.details_id}'] || 'Interprétation non disponible.'">${d.name} (${d.percent}%)</button>`;
+      listContainer.appendChild(li);
+    });
+
+  const g25Map = L.map('g25Map').setView([45, 10], 3); // Europe-centered
+const legend = L.control({ position: 'bottomright' });
+
+legend.onAdd = function () {
+  const div = L.DomUtil.create('div', 'bg-white p-3 text-xs rounded shadow border border-gray-300 space-y-1');
+  div.innerHTML += '<strong>Pourcentage G25</strong><br>';
+  div.innerHTML += '<div><span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2" style="width:8px; height:8px;"></span> 0–2%</div>';
+  div.innerHTML += '<div><span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2" style="width:12px; height:12px;"></span> 3–6%</div>';
+  div.innerHTML += '<div><span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2" style="width:16px; height:16px;"></span> 7–10%</div>';
+  div.innerHTML += '<div><span class="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2" style="width:20px; height:20px;"></span> >10%</div>';
+  return div;
+};
+
+legend.addTo(g25Map);
+
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(g25Map);
+
+  const g25GeoData = [
+    { name: "Espagne Médiévale", lat: 40.4, lon: -3.7, percent: 17.0 },
+    { name: "Irlande (Kilteasheen)", lat: 53.9, lon: -8.2, percent: 8.6 },
+    { name: "Albanie", lat: 41.3, lon: 19.8, percent: 9.6 },
+    { name: "Angleterre", lat: 52.5, lon: -1.9, percent: 6.8 },
+    { name: "Sardaigne", lat: 40.0, lon: 9.0, percent: 7.0 },
+    { name: "Liban", lat: 33.8, lon: 35.5, percent: 5.2 },
+    { name: "Estonie", lat: 58.6, lon: 25.0, percent: 4.6 },
+    { name: "Allemagne", lat: 51.1, lon: 10.4, percent: 4.6 },
+    { name: "Danemark", lat: 55.7, lon: 12.6, percent: 2.2 },
+    { name: "Russie (Oural)", lat: 55.0, lon: 60.0, percent: 0.8 },
+    { name: "Ukraine", lat: 48.4, lon: 31.2, percent: 0.2 }
+  ];
+
+const allMarkers = [];
+
+function updateMarkers(filter = 'all') {
+  allMarkers.forEach(m => g25Map.removeLayer(m));
+  allMarkers.length = 0;
+
+  g25GeoData.forEach(region => {
+    const { percent } = region;
+    let include = false;
+
+    if (filter === 'all') include = true;
+    else if (filter === 'gt10' && percent > 10) include = true;
+    else if (filter === 'btw5_10' && percent >= 5 && percent <= 10) include = true;
+    else if (filter === 'lt5' && percent < 5) include = true;
+
+    if (include) {
+      const marker = L.circleMarker([region.lat, region.lon], {
+        radius: 6 + region.percent / 2,
+        color: '#2563eb',
+        fillColor: '#3b82f6',
+        fillOpacity: 0.5
+      }).addTo(g25Map).bindPopup(`<strong>${region.name}</strong><br>${region.percent}%`);
+      allMarkers.push(marker);
+    }
+  });
+}
+
+// Initial load
+updateMarkers();
+document.getElementById('g25Filter').addEventListener('change', function () {
+  updateMarkers(this.value);
+});
+
+  </script>
+
+</body>
+</html>
